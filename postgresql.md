@@ -1,5 +1,30 @@
 # PostgreSQL
 
+## pg_upgrade
+```sql
+-- I upgrade postgresql 10 to 12
+-- https://dev.to/jkostolansky/how-to-upgrade-postgresql-from-11-to-12-2la6
+-- postgres conf file: /etc/postgresql/<version>/main
+-- restore pg_hba.conf to original settings
+# Database administrative login by Unix domain socket
+local   all             postgres                                peer
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+# "local" is for Unix domain socket connections only
+local   all             all                                     peer
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            md5
+# IPv6 local connections:
+host    all             all             ::1/128                 md5
+# Allow replication connections from localhost, by a user with the
+# replication privilege.
+local   replication     all                                     peer
+host    replication     all             127.0.0.1/32            md5
+host    replication     all             ::1/128                 md5
+
+-- check pg_upgrade error here: /var/lib/postgres
+-- pg_upgrade: “lc_collate values for database ”postgres“ do not match” https://stackoverflow.com/a/50491980
+```
+
 ## Use pg_dump, pg_restore or psql to backup and restore db or schema
 1. Dump a schema to sql and retore
 ```sql
