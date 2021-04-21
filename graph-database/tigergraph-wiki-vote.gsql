@@ -1,0 +1,48 @@
+# 127.0.0.1:14240
+# even if you install tigergraph in non-default folder, and chown to non-tigergraph user & group, you still can't execute
+# tigergraph user is not able to run sudo on localhost
+
+# create vertex
+CREATE VERTEX person(PRIMARY_ID id INT) WITH primary_id_as_attribute="TRUE"
+# create edge
+CREATE DIRECTED EDGE VOTES_FOR (FROM person, TO person) WITH REVERSE_EDGE="VOTES_FOR_REVERSE"
+# create graph
+CREATE GRAPH wiki (person, VOTES_FOR)
+# create job
+USE GRAPH wiki
+BEGIN
+CREATE LOADING JOB load_wiki FOR GRAPH wiki {
+    DEFINE FILENAME file1="/home/tester/wiki-Vote.csv";
+    LOAD file1 TO VERTEX person VALUES ($0) USING header="true", separator="\t";
+    LOAD file1 TO VERTEX person VALUES ($1) USING header="true", separator="\t";
+    LOAD file1 TO EDGE VOTES_FOR VALUES ($0, $1) USING header="true", separator="\t";
+}
+END
+# run job
+RUN LOADING JOB load_wiki
+
+# query user
+SELECT * FROM person WHERE primary_id==1629
+
+# query relationship
+# INTERPRET QUERY () SYNTAX v2 {result = SELECT p FROM person:p WHERE p.id==30; PRINT result;}
+# INTERPRET QUERY () SYNTAX v2 {result = SELECT p2 FROM person:p -(VOTES_FOR>)- person:p2 WHERE p.id==30; PRINT result;}
+# INTERPRET QUERY () SYNTAX v2 {SELECT p2 INTO T FROM person:p -(VOTES_FOR>)- person:p2 WHERE p.id==30; PRINT T;}
+INTERPRET QUERY () SYNTAX v2 {SumAccum<int> @@cnt= 0; DATETIME before; before = now(); result = SELECT p2 FROM person:p -(VOTES_FOR>)- person:p2 WHERE p.id==30 ACCUM @@cnt += 1; PRINT("timing took " + to_string(datetime_diff(now(), before)) + " seconds") AS timing; PRINT @@cnt;}
+## method 2 to see if can get timing by default
+## useless as not getting timing in milliseconds
+# CREATE QUERY get_node() FOR GRAPH wiki SYNTAX v2 {SumAccum<int> @@cnt= 0; DATETIME before; before = now(); result = SELECT p2 FROM person:p -(VOTES_FOR>)- person:p2 WHERE p.id==30 ACCUM @@cnt += 1; PRINT("timing took " + to_string(datetime_diff(now(), before)) + " seconds") AS timing; PRINT @@cnt;}
+# INSTALL QUERY get_node
+# RUN QUERY get_node()
+
+# query 2nd-degree relationship
+INTERPRET QUERY () SYNTAX v2 {SumAccum<int> @@cnt= 0; result = SELECT p2 FROM person:p -(VOTES_FOR>.VOTES_FOR>)- person:p2 WHERE p.id==30 ACCUM @@cnt += 1; PRINT @@cnt;}
+INTERPRET QUERY () SYNTAX v2 {SumAccum<int> @@cnt= 0; DATETIME before; before = now(); result = SELECT p2 FROM person:p -(VOTES_FOR>.VOTES_FOR>)- person:p2 WHERE p.id==30 ACCUM @@cnt += 1; PRINT("timing took " + to_string(datetime_diff(now(), before)) + " seconds") AS timing; PRINT @@cnt;}
+
+# query 3rd-degree relationship
+INTERPRET QUERY () SYNTAX v2 {SumAccum<int> @@cnt= 0; result = SELECT p2 FROM person:p -(VOTES_FOR>.VOTES_FOR>.VOTES_FOR>)- person:p2 WHERE p.id==30 ACCUM @@cnt += 1; PRINT @@cnt;}
+INTERPRET QUERY () SYNTAX v2 {SumAccum<int> @@cnt= 0; DATETIME before; before = now(); result = SELECT p2 FROM person:p -(VOTES_FOR>.VOTES_FOR>.VOTES_FOR>)- person:p2 WHERE p.id==30 ACCUM @@cnt += 1; PRINT("timing took " + to_string(datetime_diff(now(), before)) + " seconds") AS timing; PRINT @@cnt;}
+
+# clean
+USE GLOBAL
+DROP ALL
