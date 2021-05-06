@@ -76,6 +76,14 @@ docker exec -it nostalgic_mayer bash
 # drop all
 curl -X POST localhost:8080/alter -d '{"drop_all": true}'
 
+# count
+curl -H "Content-Type: application/dql" localhost:8080/query -XPOST -d '
+{
+  total (func: has (ProductName)) {
+    count(uid)
+  }
+}' | python -m json.tool | less
+
 # query specific uid
 curl -H "Content-Type: application/dql" localhost:8080/query -XPOST -d '
 {
