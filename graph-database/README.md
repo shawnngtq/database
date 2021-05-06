@@ -73,16 +73,36 @@ docker exec -it nostalgic_mayer bash
 ## Dgraph Execution
 
 ```bash
+# drop all
+curl -X POST localhost:8080/alter -d '{"drop_all": true}'
+
+# query specific uid
+curl -H "Content-Type: application/dql" localhost:8080/query -XPOST -d '
+{
+  node(func: uid(0x01)) {
+    uid
+    ProductName
+		SupplierID
+		CategoryID
+		QuantityPerUnit
+		UnitPrice
+		UnitsInStock
+		UnitsOnOrder
+		ReorderLevel
+		Discontinued
+  }
+}' | python -m json.tool | less
+
 # run benchmark dataset categories.csv
-./dgraph-categories.csv
+./dgraph-categories.sh
 # run benchmark dataset employees.csv
-./dgraph-employees.csv
+./dgraph-employees.sh
 # run benchmark dataset suppliers.csv
-./dgraph-suppliers.csv
+./dgraph-suppliers.sh
 # run benchmark dataset products.csv
-./dgraph-products.csv
+./dgraph-products.sh
 # run benchmark dataset orders.csv
-./dgraph-orders.csv
+./dgraph-orders.sh
 # run benchmark dataset Wiki-Vote.csv
-./dgraph-wiki-vote.csv
+./dgraph-wiki-vote.sh
 ```
