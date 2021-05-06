@@ -93,16 +93,16 @@ curl -H "Content-Type: application/dql" localhost:8080/query -XPOST -d '
   }
 }' | python -m json.tool | less
 
-# run benchmark dataset categories.csv
+# run benchmark dataset categories.json
 ./dgraph-categories.sh
-# run benchmark dataset employees.csv
+# run benchmark dataset employees.json
 ./dgraph-employees.sh
-# run benchmark dataset suppliers.csv
+# run benchmark dataset suppliers.json
 ./dgraph-suppliers.sh
-# run benchmark dataset products.csv
+# run benchmark dataset products.json
 ./dgraph-products.sh
-# run benchmark dataset orders.csv
+# run benchmark dataset orders.json
 ./dgraph-orders.sh
-# run benchmark dataset Wiki-Vote.csv
+# run benchmark dataset Wiki-Vote.json
 ./dgraph-wiki-vote.sh
 ```
