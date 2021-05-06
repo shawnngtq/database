@@ -90,14 +90,14 @@ curl -H "Content-Type: application/dql" localhost:8080/query -XPOST -d '
   node(func: uid(0x01)) {
     uid
     ProductName
-		SupplierID
-		CategoryID
-		QuantityPerUnit
-		UnitPrice
-		UnitsInStock
-		UnitsOnOrder
-		ReorderLevel
-		Discontinued
+    SupplierID
+    CategoryID
+    QuantityPerUnit
+    UnitPrice
+    UnitsInStock
+    UnitsOnOrder
+    ReorderLevel
+    Discontinued
   }
 }' | python -m json.tool | less
 
